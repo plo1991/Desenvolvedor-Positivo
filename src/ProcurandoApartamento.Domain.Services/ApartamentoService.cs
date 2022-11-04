@@ -3,6 +3,7 @@ using JHipsterNet.Core.Pagination;
 using ProcurandoApartamento.Domain.Services.Interfaces;
 using ProcurandoApartamento.Domain.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace ProcurandoApartamento.Domain.Services
 {
@@ -40,6 +41,30 @@ namespace ProcurandoApartamento.Domain.Services
         {
             await _apartamentoRepository.DeleteByIdAsync(id);
             await _apartamentoRepository.SaveChangesAsync();
+        }
+
+        public virtual async Task<string> GetMelhorApartamento(string[] estabelecimentos)
+        {
+            var Apartamentos = await _apartamentoRepository.QueryHelper()
+                .GetAllFilterAsync(x => x.EstabelecimentoExiste && x.ApartamentoDisponivel
+                                   && estabelecimentos.Contains(x.Estabelecimento));
+            
+            var ret = Apartamentos.GroupBy(x => x.Quadra).ToList();
+                        
+            var melhorQuadra = 0;
+            var qtdImoveis = 0;
+
+            foreach (var item in ret)
+            {
+                if (item.Count() >= qtdImoveis)
+                {
+                    melhorQuadra = item.Key;
+                    qtdImoveis = item.Count();
+                }
+
+            }
+
+            return string.Format("QUADRA: {0}", melhorQuadra.ToString());
         }
     }
 }

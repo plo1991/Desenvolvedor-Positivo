@@ -13,6 +13,7 @@ namespace ProcurandoApartamento.Domain.Repositories.Interfaces
         INoSqlFluentRepository<TEntity> OrderBy(Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy);
         Task<TEntity> GetOneAsync(Expression<Func<TEntity, bool>> filter);
         Task<IEnumerable<TEntity>> GetAllAsync();
+        Task<IEnumerable<TEntity>> GetAllFilterAsync(Expression<Func<TEntity, bool>> filter);
         Task<IPage<TEntity>> GetPageAsync(IPageable pageable);
     }
 }

@@ -107,5 +107,12 @@ namespace ProcurandoApartamento.Infrastructure.Data.Repositories
 
             return query;
         }
+
+        async Task<IEnumerable<TEntity>> INoSqlFluentRepository<TEntity>.GetAllFilterAsync(Expression<Func<TEntity, bool>> filter)
+        {
+            _filter = filter;
+            IQueryable<TEntity> query = BuildQuery();
+            return await query.ToListAsync();
+        }
     }
 }

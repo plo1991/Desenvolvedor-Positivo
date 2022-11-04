@@ -136,6 +136,40 @@ namespace ProcurandoApartamento.Test.Controllers
         }
 
         [Fact]
+        public async Task GetMelhorApartamento()
+        {
+            string[] estabelecimento = new string[] { "ESCOLA", "MERCADO", "ACADEMIA" };
+
+            await _apartamentoRepository.CreateOrUpdateAsync(_apartamento);
+            await _apartamentoRepository.SaveChangesAsync();
+
+            var response = await GetMelhoresApartamentos(estabelecimento);
+        }
+
+        public async Task<string> GetMelhoresApartamentos(string[] estabelecimentos)
+        {
+            var Apartamentos = await _apartamentoRepository.QueryHelper()
+               .GetAllFilterAsync(x => x.EstabelecimentoExiste && x.ApartamentoDisponivel
+                                  && estabelecimentos.Contains(x.Estabelecimento));
+
+            var ret = Apartamentos.GroupBy(x => x.Quadra).ToList();
+
+            var melhorQuadra = 0;
+            var qtdImoveis = 0;
+
+            foreach (var item in ret)
+            {
+                if (item.Count() >= qtdImoveis)
+                {
+                    melhorQuadra = item.Key;
+                    qtdImoveis = item.Count();
+                }
+            }
+
+            return string.Format("QUADRA: {0}", melhorQuadra.ToString());
+        }
+
+        [Fact]
         public async Task GetNonExistingApartamento()
         {
             var maxValue = long.MaxValue;
